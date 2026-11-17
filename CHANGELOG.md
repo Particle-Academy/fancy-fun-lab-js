@@ -10,6 +10,8 @@ promising otherwise until 1.0.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-17
+
 ### Added
 
 - **The engine**, a port of `particle-academy/laravel-fun-lab` 0.8.0: catalog setup with laravel-fun-lab's validation, aliases and upsert-by-slug; XP awards to gamed metrics with the per-action cap, validation steps and opt-out; metric and weighted group levels, each claimed exactly once with a compare-and-set and announced in ascending order, granting the achievements attached to them; achievements held once and prizes until their inventory runs out, with claim and fulfil; `hasLevel` and `levelInfo` (progress from the current level's floor, clamped to 0-100); leaderboards (all-time, daily, weekly, monthly on XP earned in the period, per metric, paged, ties on profile id); analytics over the event log; events; and serialisers producing the PHP API's JSON shapes, so `@particle-academy/fancy-fun-lab-ui` renders either backend.
