@@ -109,3 +109,9 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # Load the BUILT package, both entry points, ESM and CJS. The source tests
+      # passed once while dist/sqlite imported an npm package called `sqlite`
+      # (tsup stripped `node:`), so only this proves what consumers install.
+      - name: Check the built package
+        run: npm run check:dist

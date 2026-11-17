@@ -243,6 +243,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Check the built package
+        run: npm run check:dist
+
       # Trusted Publishing (OIDC) — no tokens. Requires npm 11.5.1+ (the runner
       # ships npm 10.x), so fetch a fresh npm via npx. The repo's Trusted
       # Publisher (npmjs.com → package → Access) authorizes this workflow.

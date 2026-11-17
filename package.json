@@ -48,7 +48,8 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "clean": "rm -rf dist",
-        "prepublishOnly": "tsup"
+        "prepublishOnly": "tsup",
+        "check:dist": "node scripts/check-dist.mjs"
     },
     "keywords": [
         "gamification",

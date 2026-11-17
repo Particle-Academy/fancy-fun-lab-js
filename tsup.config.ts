@@ -22,6 +22,10 @@ export default defineConfig([
     clean: false,
     platform: "node",
     external: ["node:sqlite"],
+    // tsup strips `node:` by default, which turns `node:sqlite` into an import
+    // of an npm package called `sqlite`: `sqlite` is not one of the old
+    // builtins that resolve without the prefix. scripts/check-dist.mjs guards it.
+    removeNodeProtocol: false,
     treeshake: true,
   },
 ]);
