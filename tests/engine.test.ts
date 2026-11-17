@@ -11,6 +11,10 @@ import {
   InMemoryStore,
   InvalidArgumentError,
   PeriodLeaderboardUnavailableError,
+  achievementUnlockedPayload,
+  levelReachedPayload,
+  prizeAwardedPayload,
+  xpAwardedPayload,
   type FunLabEventName,
   type Store,
 } from "../src/index";
@@ -139,6 +143,31 @@ describe("events and the log", () => {
     expect(seen).toEqual([]);
     expect(lab.analytics().count()).toBe(0);
     expect(() => lab.leaderboard().period("weekly").get()).toThrow(PeriodLeaderboardUnavailableError);
+  });
+
+  it("each broadcastable event keeps its raw rows and carries the flat payload its exported serializer produces", () => {
+    const lab = new FunLab({ clock });
+    const seen: Record<string, any> = {};
+    for (const n of ["xp.awarded", "metric.level-reached", "achievement.unlocked", "prize.awarded"] as const) {
+      lab.on(n, (e) => (seen[n] = e));
+    }
+    lab.setup("gamed-metric", { slug: "combat-xp", name: "Combat XP" });
+    lab.setup("metric-level", { metric: "combat-xp", level: 2, xp: 5, name: "Two" });
+    lab.setup("achievement", { slug: "two", icon: "star" });
+    lab.setup("prize", { slug: "hat" });
+    lab.attachAchievement("two", { metric: "combat-xp", level: 2 });
+    lab.award("combat-xp").to(ada).amount(5).save();
+    lab.grant("hat").to(ada).save();
+
+    const xp = seen["xp.awarded"];
+    expect(xp.metric.slug).toBe("combat-xp"); // additive: the raw rows are still there
+    expect(xp.payload).toEqual(xpAwardedPayload(xp));
+    expect(xp.payload).toMatchObject({ id: 1, gamed_metric_name: "Combat XP", amount: 5, current_level: 2 });
+    expect(seen["metric.level-reached"].payload).toEqual(levelReachedPayload(seen["metric.level-reached"]));
+    expect(seen["metric.level-reached"].payload.achievements).toEqual([{ id: 1, slug: "two", name: "Two", icon: "star" }]);
+    expect(seen["achievement.unlocked"].payload).toEqual(achievementUnlockedPayload(seen["achievement.unlocked"]));
+    expect(seen["prize.awarded"].payload).toEqual(prizeAwardedPayload(seen["prize.awarded"]));
+    expect(seen["prize.awarded"].payload).toMatchObject({ grant_type: "prize", status: "granted" });
   });
 
   it("logToDatabase=false still emits", () => {

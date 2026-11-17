@@ -1,6 +1,6 @@
 {
     "name": "@particle-academy/fancy-fun-lab",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Headless gamification engine: XP to gamed metrics, levels and weighted level groups, achievements, prizes with inventory, leaderboards and an event log with analytics. Zero runtime dependencies. The Node/TypeScript twin of the PHP particle-academy/laravel-fun-lab, held to it by shared conformance fixtures.",
     "repository": {
         "type": "git",
@@ -65,7 +65,7 @@
         "human-plus"
     ],
     "devDependencies": {
-        "@particle-academy/fancy-conformance": "^0.49.0",
+        "@particle-academy/fancy-conformance": "^0.50.0",
         "@types/node": "^22",
         "tsup": "^8.5.0",
         "typescript": "^5.8.0",

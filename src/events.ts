@@ -1,3 +1,9 @@
+import type {
+  AchievementUnlockedPayload,
+  LevelReachedPayload,
+  PrizeAwardedPayload,
+  XpAwardedPayload,
+} from "./payloads";
 import type { Row } from "./store";
 
 /** Who receives XP, achievements and prizes: an awardable type ("user", "team") and its id. */
@@ -15,6 +21,10 @@ export interface XpAwardedEvent {
   reason: string | null;
   source: string | null;
   meta: Record<string, unknown>;
+  /** When it happened, in Carbon's toIso8601String() form. */
+  occurredAt: string;
+  /** The flat wire payload laravel-fun-lab broadcasts (`xpAwardedPayload(event)`). */
+  payload: XpAwardedPayload;
 }
 
 export interface MetricLevelReachedEvent {
@@ -27,6 +37,10 @@ export interface MetricLevelReachedEvent {
   /** The achievements this crossing granted, not ones already held. */
   achievements: Row[];
   totalXp: number;
+  /** When it happened, in Carbon's toIso8601String() form. */
+  occurredAt: string;
+  /** The flat wire payload laravel-fun-lab broadcasts (`levelReachedPayload(event)`). */
+  payload: LevelReachedPayload;
 }
 
 export interface AchievementUnlockedEvent {
@@ -35,6 +49,8 @@ export interface AchievementUnlockedEvent {
   grant: Row;
   reason: string | null;
   source: string | null;
+  /** The flat wire payload laravel-fun-lab broadcasts (`achievementUnlockedPayload(event)`). */
+  payload: AchievementUnlockedPayload;
 }
 
 export interface PrizeAwardedEvent {
@@ -44,6 +60,8 @@ export interface PrizeAwardedEvent {
   reason: string | null;
   source: string | null;
   meta: Record<string, unknown>;
+  /** The flat wire payload laravel-fun-lab broadcasts (`prizeAwardedPayload(event)`). */
+  payload: PrizeAwardedPayload;
 }
 
 export interface AwardGrantedEvent {

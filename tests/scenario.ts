@@ -30,7 +30,15 @@ const EVENTS: FunLabEventName[] = [
   "catalog.mutated",
 ];
 
-export function runScenario(input: Record<string, unknown>, makeStore: () => Store): unknown {
+/** The events laravel-fun-lab broadcasts; the fun-lab/events table pins their payloads. */
+const BROADCASTS: FunLabEventName[] = ["xp.awarded", "metric.level-reached", "achievement.unlocked", "prize.awarded"];
+
+/**
+ * `broadcasts: false` is fun-lab/progression's `scenario` (contract fields per
+ * event); `true` is fun-lab/events' `broadcasts`: each broadcastable event's
+ * `payload`, the field a host relays to Echo listeners as is.
+ */
+export function runScenario(input: Record<string, unknown>, makeStore: () => Store, broadcasts = false): unknown {
   let now = new Date(String(input.clock));
   const config = (input.config ?? {}) as Record<string, unknown>;
   const lab = new FunLab({
@@ -44,9 +52,9 @@ export function runScenario(input: Record<string, unknown>, makeStore: () => Sto
   });
 
   let captured: Record<string, unknown>[] = [];
-  for (const name of EVENTS) {
+  for (const name of broadcasts ? BROADCASTS : EVENTS) {
     lab.on(name, (e: any) => {
-      captured.push({ event: name, ...eventFields(name, e) });
+      captured.push(broadcasts ? { event: name, payload: e.payload } : { event: name, ...eventFields(name, e) });
     });
   }
 
@@ -192,7 +200,7 @@ export function runScenario(input: Record<string, unknown>, makeStore: () => Sto
   for (const s of input.steps as Step[]) {
     captured = [];
     const result = step(s);
-    steps.push({ result, events: captured });
+    steps.push(broadcasts ? { result, broadcasts: captured } : { result, events: captured });
   }
 
   // JSON round trip: the golden is JSON, so an `undefined` key or a -0 must

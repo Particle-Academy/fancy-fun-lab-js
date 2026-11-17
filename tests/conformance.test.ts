@@ -26,7 +26,7 @@ import { runScenario, runStringCase } from "./scenario";
  */
 
 /** Moved deliberately, never automatically. A pin that follows disk asserts nothing. */
-const PINNED_SUITE_VERSION = "0.49.0";
+const PINNED_SUITE_VERSION = "0.50.0";
 
 const SUITES: Record<string, number> = {
   "fun-lab/strings": 21,
@@ -34,6 +34,7 @@ const SUITES: Record<string, number> = {
   "fun-lab/grants": 10,
   "fun-lab/leaderboard": 11,
   "fun-lab/analytics": 8,
+  "fun-lab/events": 9,
 };
 
 const STORES: Record<string, () => Store> = {
@@ -44,6 +45,7 @@ const STORES: Record<string, () => Store> = {
 function runCase(c: ConformanceCase, makeStore: () => Store): unknown {
   if (c.fn === "slug" || c.fn === "headline") return runStringCase(c.fn, String(c.input.value));
   if (c.fn === "scenario") return runScenario(c.input, makeStore);
+  if (c.fn === "broadcasts") return runScenario(c.input, makeStore, true);
   throw new Error(`case ${c.id} calls unimplemented fn ${String(c.fn)}`);
 }
 

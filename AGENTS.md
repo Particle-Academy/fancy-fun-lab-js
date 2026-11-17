@@ -88,6 +88,21 @@ Events: `xp.awarded`, `metric.level-reached` (once per level crossed,
 ascending), `achievement.unlocked`, `prize.awarded`, `award.granted`,
 `catalog.mutated`.
 
+**Relay `event.payload`, not the event.** The four broadcastable events
+(`xp.awarded`, `metric.level-reached`, `achievement.unlocked`, `prize.awarded`)
+carry `payload`: the flat object laravel-fun-lab broadcasts over Echo, which
+`@particle-academy/fancy-fun-lab-ui` reads (`feedItemFromEcho`, `FunLabXpFeed`,
+`FunLabLevelUp`). The event's other fields are raw rows; sending those makes
+the UI render `+5 XP in {metric}`.
+
+```ts
+lab.on("xp.awarded", (e) => socket.emit("xp.awarded", e.payload));
+```
+
+The same serializers are exported: `xpAwardedPayload(e)`,
+`levelReachedPayload(e)`, `achievementUnlockedPayload(e)`,
+`prizeAwardedPayload(e)`, with their types.
+
 ## Traps
 
 - **Period boards need the event log.** `period("weekly")` ranks on XP earned

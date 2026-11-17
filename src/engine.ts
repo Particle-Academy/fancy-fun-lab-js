@@ -8,6 +8,12 @@ import {
 } from "./events";
 import { Leaderboard } from "./leaderboard";
 import {
+  achievementUnlockedPayload,
+  levelReachedPayload,
+  prizeAwardedPayload,
+  xpAwardedPayload,
+} from "./payloads";
+import {
   achievementGrantResource,
   achievementResource,
   gamedMetricResource,
@@ -156,6 +162,11 @@ const isEmpty = (v: unknown): boolean =>
 const logMeta = (m: Record<string, unknown>): unknown => (isEmpty(m) ? [] : m);
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
+
+/** An event object with its flat wire payload attached, so a listener can relay `event.payload` as is. */
+function withPayload<E extends object, P>(event: E, serialize: (e: E) => P): E & { payload: P } {
+  return Object.assign(event, { payload: serialize(event) });
+}
 
 function valueType(v: unknown): string {
   if (typeof v === "number") return Number.isInteger(v) ? "int" : "float";
@@ -468,16 +479,20 @@ export class FunLab {
     if (this.config.dispatch) {
       this.event(
         "xp.awarded",
-        {
-          profile: this.store.find("profiles", profile.id)!,
-          profileMetric: pm,
-          metric,
-          subject,
-          amount,
-          reason,
-          source,
-          meta,
-        },
+        withPayload(
+          {
+            profile: this.store.find("profiles", profile.id)!,
+            profileMetric: pm,
+            metric,
+            subject,
+            amount,
+            reason,
+            source,
+            meta,
+            occurredAt: this.iso(),
+          },
+          xpAwardedPayload,
+        ),
         {
           event_type: "xp_awarded",
           award_type: "points",
@@ -523,15 +538,22 @@ export class FunLab {
         if (result.success) granted.push(achievement);
       }
       if (this.config.dispatch) {
-        this.emitter.emit("metric.level-reached", {
-          profile,
-          profileMetric: pm,
-          metric,
-          level,
-          subject,
-          achievements: granted,
-          totalXp: Number(pm.total_xp),
-        });
+        this.emitter.emit(
+          "metric.level-reached",
+          withPayload(
+            {
+              profile,
+              profileMetric: pm,
+              metric,
+              level,
+              subject,
+              achievements: granted,
+              totalXp: Number(pm.total_xp),
+              occurredAt: this.iso(),
+            },
+            levelReachedPayload,
+          ),
+        );
       }
     }
     return pm;
@@ -651,7 +673,7 @@ export class FunLab {
     if (this.config.dispatch) {
       this.event(
         "achievement.unlocked",
-        { subject, achievement, grant, reason, source },
+        withPayload({ subject, achievement, grant, reason, source }, achievementUnlockedPayload),
         {
           event_type: "achievement_unlocked",
           award_type: "achievement",
@@ -697,7 +719,7 @@ export class FunLab {
     if (this.config.dispatch) {
       this.event(
         "prize.awarded",
-        { subject, prize, grant, reason, source, meta },
+        withPayload({ subject, prize, grant, reason, source, meta }, prizeAwardedPayload),
         {
           event_type: "prize_awarded",
           award_type: "prize",

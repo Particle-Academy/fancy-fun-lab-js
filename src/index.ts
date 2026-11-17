@@ -31,6 +31,16 @@ export {
   type AwardGrantedEvent,
   type CatalogMutatedEvent,
 } from "./events";
+export {
+  xpAwardedPayload,
+  levelReachedPayload,
+  achievementUnlockedPayload,
+  prizeAwardedPayload,
+  type XpAwardedPayload,
+  type LevelReachedPayload,
+  type AchievementUnlockedPayload,
+  type PrizeAwardedPayload,
+} from "./payloads";
 export { InvalidArgumentError, AwardRejectedError, PeriodLeaderboardUnavailableError } from "./errors";
 export { InMemoryStore, type Store, type Row } from "./store";
 export { SCHEMA, UNIQUE, type TableName, type ColumnKind } from "./schema";
