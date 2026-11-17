@@ -54,7 +54,11 @@ lab.leaderboard().for("user").period("weekly").take(10); // ranked on XP earned 
 
 ## Status
 
-Pre-release: not yet published to npm. Node 22 or later; the SQLite store needs
+```bash
+npm install @particle-academy/fancy-fun-lab
+```
+
+Node 22 or later; the SQLite store needs
 22.13 or later, where `node:sqlite` needs no flag.
 
 ## License
